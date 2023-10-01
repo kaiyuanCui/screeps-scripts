@@ -20,7 +20,7 @@ var roleUpgrader = {
         }
         else {
              // harvest
-            harvestingUtils.findClosestEnergySource(creep);
+             harvestingUtils.collectFromDropped(creep);
         }
 	}
 };

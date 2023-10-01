@@ -1,6 +1,7 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
+var roleMover = require('role.mover')
 var spawnManager = require('spawnManager');
 
 module.exports.loop = function () {
@@ -39,7 +40,8 @@ module.exports.loop = function () {
     
        // Define a list of priority roles with desired counts
     var priorityRoles = [
-        { roleName: 'harvester', desiredCount: 4 },
+        { roleName: 'mover', desiredCount: 2 },
+        { roleName: 'harvester', desiredCount: 3 },
         { roleName: 'builder', desiredCount: 4 },
         { roleName: 'upgrader', desiredCount: 2 },
         
@@ -89,11 +91,14 @@ module.exports.loop = function () {
         if(creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
-        if(creep.memory.role == 'upgrader') {
+        else if(creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
         }
-        if(creep.memory.role == 'builder') {
+        else if(creep.memory.role == 'builder') {
             roleBuilder.run(creep);
+        }
+        else if(creep.memory.role == 'mover') {
+            roleMover.run(creep);
         }
     }
 }

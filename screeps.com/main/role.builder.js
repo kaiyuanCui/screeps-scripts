@@ -39,7 +39,7 @@ const roleBuilder = {
             }
         } else {
             // harvest
-            harvestingUtils.findClosestEnergySource(creep);
+            harvestingUtils.collectFromDropped(creep);
             
         }
     }

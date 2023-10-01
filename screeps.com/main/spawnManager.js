@@ -1,13 +1,28 @@
 // spawnManager.js
+const PARTS_COST ={
+    MOVE: 50,
+    WORK: 100,
+    CARRY: 50,
+};
+
+const ROLES_PARTS = {
+    'mover': [MOVE, CARRY, MOVE, WORK, CARRY],
+    'harvester': [WORK, WORK, MOVE, CARRY],
+    'upgrader': [MOVE, CARRY, MOVE, WORK, CARRY],
+    'builder': [MOVE, CARRY, MOVE, WORK, CARRY],
+}
+
+
 
 const spawnManager = {
-    spawnCreep: function(spawn, roleName, energyAvailable) {
+    spawnCreep: function(spawn, roleName, energyLimit) {
         if (spawn.spawning) {
             // The spawn is already in use, so we can't spawn another creep right now.
             return ERR_BUSY;
         }
 
-        const bodyParts = this.calculateBodyParts(energyAvailable);
+        // TODO: calculate total cost
+        const bodyParts = ROLES_PARTS[roleName]
 
         if (!bodyParts) {
             return ERR_NOT_ENOUGH_ENERGY; // Not enough energy to spawn
@@ -27,25 +42,25 @@ const spawnManager = {
         return result;
     },
 
-   calculateBodyParts: function(energyAvailable) {
-        // Ensure at least one part of each type: WORK, CARRY, and MOVE
-        const bodyParts = [WORK, CARRY, MOVE];
-        let remainingEnergy = energyAvailable - 200; // Subtract energy for one part of each type
+//    calculateBodyParts: function(energyAvailable) {
+//         // Ensure at least one part of each type: WORK, CARRY, and MOVE
+//         const bodyParts = [WORK, CARRY, MOVE];
+//         let remainingEnergy = energyAvailable - 200; // Subtract energy for one part of each type
 
-        // Calculate additional body parts with the remaining energy
-        while (remainingEnergy >= 50) { // 50 is the cost of one MOVE
-            if (remainingEnergy >= 100) { // 100 is the cost of one WORK or CARRY
-                bodyParts.push(WORK);
-                remainingEnergy -= 100;
-            }
-            if (remainingEnergy >= 50) {
-                bodyParts.push(MOVE);
-                remainingEnergy -= 50;
-            }
-        }
+//         // Calculate additional body parts with the remaining energy
+//         while (remainingEnergy >= 50) { // 50 is the cost of one MOVE
+//             if (remainingEnergy >= 100) { // 100 is the cost of one WORK or CARRY
+//                 bodyParts.push(WORK);
+//                 remainingEnergy -= 100;
+//             }
+//             if (remainingEnergy >= 50) {
+//                 bodyParts.push(MOVE);
+//                 remainingEnergy -= 50;
+//             }
+//         }
 
-        return bodyParts;
-    },
+//         return bodyParts;
+//     },
 };
 
 module.exports = spawnManager;
