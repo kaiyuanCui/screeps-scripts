@@ -57,7 +57,7 @@ module.exports.loop = function () {
             // Check if the role count is less than the desired count
             var roleCount = _.filter(Game.creeps, (creep) => creep.memory.role == roleName).length;
             if (roleCount < desiredCount) {
-                var result = spawnManager.spawnCreep(Game.spawns['Spawn1'], roleName, energyAvailable);
+                var result = spawnManager.spawnCreep(Game.spawns['Spawn1'], roleName, energyThreshold);
     
                 if (result === OK) {
                     console.log(`Spawning a new ${roleName}`);
