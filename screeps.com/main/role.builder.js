@@ -1,6 +1,6 @@
 const harvestingUtils = require('harvestingUtils'); // Import the harvestingUtils module
 const roleBuilder = {
-    run: function(creep, priority) {
+    run: function(creep, repairTargets, buildTargets) {
         // Check if the creep should switch between building and harvesting
         if (creep.memory.building && creep.store[RESOURCE_ENERGY] === 0) {
             creep.memory.building = false;
@@ -14,38 +14,21 @@ const roleBuilder = {
         }
 
         if (creep.memory.building) {
-            // Find the closest construction site needing repair
-            if (priority){
-                //console.log(priority);
+            //console.log(repairTargets);
+            //console.log(buildTargets);
+            if(repairTargets.length === 1 || buildTargets.length ===1){
                 creep.say('🚧priority');
-                var buildStatus = creep.build(priority);
-                if (buildStatus === ERR_NOT_IN_RANGE) {
-                        creep.moveTo(priority, { visualizePathStyle: { stroke: '#ffffff' } });
-                        return;
-                }
-                else{
-                    if (buildStatus===OK){
-                        return;
-                    }
-                    console.log(buildStatus)
-                }
-                
             }
-            var repairTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType !== STRUCTURE_WALL &&
-                            structure.structureType !== STRUCTURE_RAMPART) &&
-                            structure.hits < structure.hitsMax;
-                }
-            });
+            var repairTarget = creep.pos.findClosestByPath(repairTargets);
 
             if (repairTarget) {
                 if (creep.repair(repairTarget) === ERR_NOT_IN_RANGE) {
                     creep.moveTo(repairTarget, { visualizePathStyle: { stroke: '#ffffff' } });
                 }
-            } else {
+            } else if(buildTargets) {
+                console.log(buildTargets.length);
                 // If no repair targets, find the closest construction site
-                var constructionSite = creep.pos.findClosestByPath(FIND_MY_CONSTRUCTION_SITES);
+                var constructionSite = creep.pos.findClosestByPath(buildTargets);
 
                 if (constructionSite) {
                     if (creep.build(constructionSite) === ERR_NOT_IN_RANGE) {
