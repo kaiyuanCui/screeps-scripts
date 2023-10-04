@@ -1,6 +1,6 @@
 const harvestingUtils = require('harvestingUtils'); // Import the harvestingUtils module
 const roleBuilder = {
-    run: function(creep) {
+    run: function(creep, priority) {
         // Check if the creep should switch between building and harvesting
         if (creep.memory.building && creep.store[RESOURCE_ENERGY] === 0) {
             creep.memory.building = false;
@@ -15,6 +15,22 @@ const roleBuilder = {
 
         if (creep.memory.building) {
             // Find the closest construction site needing repair
+            if (priority){
+                //console.log(priority);
+                creep.say('🚧priority');
+                var buildStatus = creep.build(priority);
+                if (buildStatus === ERR_NOT_IN_RANGE) {
+                        creep.moveTo(priority, { visualizePathStyle: { stroke: '#ffffff' } });
+                        return;
+                }
+                else{
+                    if (buildStatus===OK){
+                        return;
+                    }
+                    console.log(buildStatus)
+                }
+                
+            }
             var repairTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return (structure.structureType !== STRUCTURE_WALL &&
@@ -39,7 +55,9 @@ const roleBuilder = {
             }
         } else {
             // harvest
-            harvestingUtils.collectFromDropped(creep);
+            if(!(harvestingUtils.collectFromStorage(creep) === OK)) {
+                 harvestingUtils.collectFromDropped(creep);
+             }
             
         }
     }

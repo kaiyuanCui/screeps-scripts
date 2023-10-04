@@ -4,6 +4,17 @@ var roleBuilder = require('role.builder');
 var roleMover = require('role.mover')
 var spawnManager = require('spawnManager');
 
+   // Define a list of priority roles with desired counts
+var priorityRoles = [
+        { roleName: 'harvester', desiredCount: 3 },
+        { roleName: 'mover', desiredCount: 9},
+        
+        { roleName: 'builder', desiredCount: 8 },
+        { roleName: 'upgrader', desiredCount: 1 },
+        
+        
+    ];
+
 module.exports.loop = function () {
     
     
@@ -16,14 +27,14 @@ module.exports.loop = function () {
     }
     
     // defence
-    var tower = Game.getObjectById('5015a5cf05c1eb0c34760da4');
+    var tower = Game.getObjectById('651b00699b1ff378a13c0ad5');
     if(tower) {
-        var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax
-        });
-        if(closestDamagedStructure) {
-            tower.repair(closestDamagedStructure);
-        }
+        // var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+        //     filter: (structure) => structure.hits < structure.hitsMax
+        // });
+        // if(closestDamagedStructure) {
+        //     tower.repair(closestDamagedStructure);
+        // }
 
         var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if(closestHostile) {
@@ -33,21 +44,15 @@ module.exports.loop = function () {
     
 
    // Energy Threshold for Spawning
-    var energyThreshold = 300; // Adjust this value as needed
+    var energyThreshold = 700; // Adjust this value as needed
 
     // Check available energy
     var energyAvailable = Game.spawns['Spawn1'].room.energyAvailable;
     
-       // Define a list of priority roles with desired counts
-    var priorityRoles = [
-        { roleName: 'mover', desiredCount: 2 },
-        { roleName: 'harvester', desiredCount: 3 },
-        { roleName: 'builder', desiredCount: 4 },
-        { roleName: 'upgrader', desiredCount: 2 },
-        
-        
-    ];
     
+    
+   
+    var vacantRoles = false;
     if(energyAvailable >= energyThreshold){
         
         // Iterate through priority roles and spawn as needed
@@ -59,6 +64,7 @@ module.exports.loop = function () {
             // Check if the role count is less than the desired count
             var roleCount = _.filter(Game.creeps, (creep) => creep.memory.role == roleName).length;
             if (roleCount < desiredCount) {
+                vacantRoles = true;
                 var result = spawnManager.spawnCreep(Game.spawns['Spawn1'], roleName, energyThreshold);
     
                 if (result === OK) {
@@ -68,7 +74,19 @@ module.exports.loop = function () {
             }
         }
         
+         // automatically increase creeps?
+        if(!vacantRoles){
+            //console.log("increasing role count")
+            
+            //priorityRoles[0].desiredCount++; // mover
+            //priorityRoles[3].desiredCount++; // upgrader
+            //console.log(priorityRoles[0].desiredCount);
+            //console.log(priorityRoles[3].desiredCount);
+        }
+        
     }
+    
+   
 
     
 
@@ -83,7 +101,7 @@ module.exports.loop = function () {
     }
 
     
-    
+    var counter = 0;
     
     // run creeps logic
     for(var name in Game.creeps) {
@@ -95,7 +113,15 @@ module.exports.loop = function () {
             roleUpgrader.run(creep);
         }
         else if(creep.memory.role == 'builder') {
-            roleBuilder.run(creep);
+            counter ++;
+            priority = Game.getObjectById('651d06a2148daba85e1b7b37');
+            // dedicate half to priority
+            if(counter%2){
+                roleBuilder.run(creep, priority);
+            }else{
+                roleBuilder.run(creep, null);
+            }
+            
         }
         else if(creep.memory.role == 'mover') {
             roleMover.run(creep);

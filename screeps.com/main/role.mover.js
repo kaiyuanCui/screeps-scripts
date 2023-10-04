@@ -21,6 +21,10 @@ const roleMover = {
         if (creep.memory.collecting) {
              // harvest
             harvestingUtils.collectFromDropped(creep);
+            //harvestingUtils.findClosestEnergySource(creep);
+            //harvestingUtils.collectFromStorage(creep);
+            //harvestingUtils.harvestFromSource(creep);
+            
            
         }
         else {
@@ -31,17 +35,69 @@ const roleMover = {
 
     depositToClosest: function(creep){
         //creep.say('🔄 deposit');
-        const container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        var container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType === STRUCTURE_EXTENSION ||
-                        structure.structureType === STRUCTURE_SPAWN ||
-                        structure.structureType === STRUCTURE_TOWER) &&
+                        structure.structureType === STRUCTURE_SPAWN )
+                        //structure.structureType === STRUCTURE_CONTAINER||
+                        //structure.structureType === STRUCTURE_TOWER) 
+                        &&
                         structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
             }
         });
-        if (container) {
-           
-            var transferStatus = creep.transfer(container, RESOURCE_ENERGY);
+        
+       ///console.log(container);
+        
+        if (!container) {
+            creep.say('🔄 tower');
+            //tower
+            container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (//structure.structureType === STRUCTURE_EXTENSION ||
+                        //structure.structureType === STRUCTURE_SPAWN ||
+                        //structure.structureType === STRUCTURE_CONTAINER &&
+                        structure.structureType === STRUCTURE_TOWER) &&
+                        structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                }
+            });
+            if (!container){
+                creep.say('🔄storage');
+                //general storage
+                container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return (//structure.structureType === STRUCTURE_EXTENSION ||
+                            //structure.structureType === STRUCTURE_SPAWN ||
+                            structure.structureType === STRUCTURE_CONTAINER )&&
+                            //structure.structureType === STRUCTURE_TOWER) &&
+                            structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
+                    }
+                });
+                
+               
+                
+            }
+            
+        }
+         if(!container){
+             //console.log(container);
+            creep.say('B');
+            // fix: this also happens when the entrance is blocked by other creeps
+            if(!creep.memory.idle){
+                console.log("NO CONTAINER AVAILABLE")
+                creep.memory.idle = true;
+            }
+            
+            const nearestSpawn = creep.pos.findClosestByPath(FIND_MY_SPAWNS);
+            
+            if (nearestSpawn) {
+                if (creep.moveTo(nearestSpawn, { visualizePathStyle: { stroke: '#0099ff' } }) === ERR_NO_PATH) {
+                        // If there's no valid path to the nearest spawn, stay put or perform another action
+                        // You can add additional logic here based on your requirements.
+                }
+            }
+        }
+        
+        var transferStatus = creep.transfer(container, RESOURCE_ENERGY);
             if (transferStatus === ERR_NOT_IN_RANGE) {
                 creep.moveTo(container, { visualizePathStyle: { stroke: '#009933' },
                 //reusePath: 5 // Example: Reuse the path for 5 ticks
@@ -55,24 +111,6 @@ const roleMover = {
                 //this.depositToClosest(creep);
                 //}
             }
-            
-        }
-        else {
-            // fix: this also happens when the entrance is blocked by other creeps
-            if(!creep.memory.idle){
-                console.log("STORAGE FULL!")
-                creep.memory.idle = true;
-            }
-            
-            const nearestSpawn = creep.pos.findClosestByPath(FIND_MY_SPAWNS);
-            
-            if (nearestSpawn) {
-                if (creep.moveTo(nearestSpawn, { visualizePathStyle: { stroke: '#0099ff' } }) === ERR_NO_PATH) {
-                        // If there's no valid path to the nearest spawn, stay put or perform another action
-                        // You can add additional logic here based on your requirements.
-                }
-            }
-        }
     }
 };
 

@@ -6,10 +6,10 @@ const PARTS_COST ={
 };
 
 const ROLES_PARTS = {
-    'mover': [MOVE, CARRY, MOVE, WORK, CARRY],
-    'harvester': [WORK, WORK, MOVE, CARRY],
-    'upgrader': [MOVE, CARRY, MOVE, WORK, CARRY],
-    'builder': [MOVE, CARRY, MOVE, WORK, CARRY],
+    'mover': [MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY,CARRY, WORK],
+    'harvester': [MOVE, CARRY, WORK,WORK,WORK,WORK],
+    'upgrader': [MOVE, MOVE, CARRY, CARRY, WORK, WORK, WORK],
+    'builder': [MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, WORK, WORK, WORK],
 }
 
 

@@ -20,7 +20,10 @@ var roleUpgrader = {
         }
         else {
              // harvest
-             harvestingUtils.collectFromDropped(creep);
+             if(!(harvestingUtils.collectFromStorage(creep) === OK)) {
+                 harvestingUtils.collectFromDropped(creep);
+             }
+             
         }
 	}
 };

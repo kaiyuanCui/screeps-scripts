@@ -45,7 +45,7 @@ const harvestingUtils = {
         
         if (tombstone) {
             if (creep.withdraw(tombstone, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
-                return creep.moveTo(tombstone, { visualizePathStyle: { stroke: '#ffaa00' } });
+                return creep.moveTo(tombstone, { visualizePathStyle: { stroke: '#FFF000' } });
             } 
         }
 
@@ -55,7 +55,7 @@ const harvestingUtils = {
 
         if (droppedEnergy){
             if (creep.pickup(droppedEnergy) == ERR_NOT_IN_RANGE) {
-                return creep.moveTo(droppedEnergy);
+                return creep.moveTo(droppedEnergy,{ visualizePathStyle: { stroke: '#FFF000' } });
             }
         }
 
@@ -65,7 +65,7 @@ const harvestingUtils = {
         });
 
         if (ruin) {
-            if (creep.withdraw(ruin) === ERR_NOT_IN_RANGE) {
+            if (creep.withdraw(ruin, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                return creep.moveTo(ruin, { visualizePathStyle: { stroke: '#ffaa00' } });
            }
            
@@ -84,8 +84,11 @@ const harvestingUtils = {
         });
 
         if (container) {
-            if (creep.withdraw(container) === ERR_NOT_IN_RANGE) {
+            if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                 return creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } });
+            }
+            else{
+                //console.log(creep.withdraw(container, RESOURCE_ENERGY));
             }
         }
 
