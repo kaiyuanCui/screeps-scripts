@@ -5,7 +5,7 @@ const roleBuilder = {
         if (creep.memory.building && creep.store[RESOURCE_ENERGY] === 0) {
             creep.memory.building = false;
             creep.memory.idle = false;
-            creep.say('🔄 harvest');
+            creep.say('🔄 collect');
         }
         if (!creep.memory.building && creep.store.getFreeCapacity() === 0) {
             creep.memory.building = true;
@@ -26,7 +26,7 @@ const roleBuilder = {
                     creep.moveTo(repairTarget, { visualizePathStyle: { stroke: '#ffffff' } });
                 }
             } else if(buildTargets) {
-                console.log(buildTargets.length);
+                //console.log(buildTargets.length);
                 // If no repair targets, find the closest construction site
                 var constructionSite = creep.pos.findClosestByPath(buildTargets);
 

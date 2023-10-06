@@ -7,10 +7,10 @@ var spawnManager = require('spawnManager');
    // Define a list of priority roles with desired counts
 var priorityRoles = [
         { roleName: 'harvester', desiredCount: 3 },
-        { roleName: 'mover', desiredCount: 9},
+        { roleName: 'mover', desiredCount: 6},
         
-        { roleName: 'builder', desiredCount: 6 },
-        { roleName: 'upgrader', desiredCount: 1 },
+        { roleName: 'builder', desiredCount: 8 },
+        { roleName: 'upgrader', desiredCount: 3 },
         
         
     ];
@@ -18,11 +18,14 @@ var priorityRoles = [
 var constructionSites = [];
 var damagedStructures = [];
 
-var buildPriority = null;
-var fixPriority = null;
+var buildPriorityId = '651f5756148dab81c31b9897';
+var fixPriorityId = null;//'651d65ea218e3a529dad8e50';
+
+var energyLevels= [];
 
 module.exports.loop = function () {
-    
+    console.log(`Tick #${Game.time}`);
+    console.log(`--------------------------------`);
      // clear memory
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
@@ -39,6 +42,22 @@ module.exports.loop = function () {
         updateDamagedStructures();
     }
 
+    // update priorities
+    if (fixPriorityId){
+        var fixPriority = Game.getObjectById(fixPriorityId);
+        if(!fixPriority || fixPriority.hits === fixPriority.hitsMax){
+            fixPriorityId = null;
+            fixPriority = null;
+        }
+    }
+    if(buildPriorityId){
+        var buildPriority = Game.getObjectById(buildPriorityId);
+        if(!buildPriority){
+            buildPriorityId = null;
+            buildPriority = null;
+        }
+    }
+    
 
     
     // defence
@@ -84,8 +103,13 @@ module.exports.loop = function () {
             var priority = null;
             //priority = Game.getObjectById('651c116ffbeacef16a65d445');
             // dedicate half to priority
-            if( roleCounts['builder'] % 2 && priority){
-                roleBuilder.run(creep, [], []);
+            if( roleCounts['builder'] % 2 && (fixPriority || buildPriority)){
+                if(fixPriority){
+                    roleBuilder.run(creep, [fixPriority], []);
+                }else if(buildPriority){
+                    roleBuilder.run(creep, [], [buildPriority]);
+                }
+               
             }else{
                 roleBuilder.run(creep, damagedStructures, constructionSites);
             }
@@ -150,9 +174,15 @@ module.exports.loop = function () {
             Game.spawns['Spawn1'].pos.y,
             { align: 'left', opacity: 0.8 });
     }
+    
+    energyLevels.push(energyAvailable);
+    if (energyLevels.length > 50){
+        energyLevels.shift(); // pop from front
+    }
+    var averageEnergy = averageVal( energyLevels ); 
 
-    console.log(`Tick #${Game.time}`);
-    console.log(`--------------------------------`);
+    console.log(`Available Energy: ${energyAvailable}/${ Game.spawns['Spawn1'].room.energyCapacityAvailable}`);
+    console.log(`Average Energy Available (past 50 ticks): ${averageEnergy}`);
     console.log(`Construction Sites: ${constructionSites.length}`);
     console.log(`Damaged Structures: ${damagedStructures.length}`);
     console.log(`harvester: ${roleCounts['harvester']}/${priorityRoles[0].desiredCount}`);
@@ -172,9 +202,26 @@ var updateConstructionSites = function(){
 var updateDamagedStructures = function(){
     damagedStructures = Game.spawns['Spawn1'].room.find(FIND_STRUCTURES, {
         filter: (structure) => {
-            return (structure.structureType !== STRUCTURE_WALL &&
-                    structure.structureType !== STRUCTURE_RAMPART) &&
+            return (structure.structureType !== STRUCTURE_WALL 
+                && structure.structureType !== STRUCTURE_RAMPART
+                    ) &&
                     structure.hits < structure.hitsMax;
         }
     });
+
+    // fix ramparts if no other things to fix
+    if (damagedStructures.length==0 && constructionSites.length==0){
+        damagedStructures = Game.spawns['Spawn1'].room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (structure.structureType !== STRUCTURE_WALL 
+                    //&& structure.structureType !== STRUCTURE_RAMPART
+                        ) &&
+                        structure.hits < structure.hitsMax;
+            }
+        });
+    }
 }
+
+const averageVal = arr => arr.reduce( ( p, c ) => p + c, 0 ) / arr.length;
+    
+
