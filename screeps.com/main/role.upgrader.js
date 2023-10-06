@@ -14,13 +14,17 @@ var roleUpgrader = {
 	    }
 
 	    if(creep.memory.upgrading) {
-            if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+            var upgradeStatus = creep.upgradeController(creep.room.controller)
+            if(upgradeStatus === ERR_NOT_IN_RANGE || upgradeStatus === OK) {
                 creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#3366ff'}});
             }
         }
         else {
              // harvest
-            harvestingUtils.findClosestEnergySource(creep);
+             if(!(harvestingUtils.collectFromStorage(creep) === OK)) {
+                 harvestingUtils.collectFromDropped(creep);
+             }
+             
         }
 	}
 };
